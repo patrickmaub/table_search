@@ -1,4 +1,4 @@
-import openai
+'''import openai
 import tiktoken
 from threading import Lock
 
@@ -20,7 +20,7 @@ class AIEngine:
 
                 # Setup OpenAI
                 # You might want to move this to a configuration file
-                openai.api_key = "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"
+                openai.api_key = ""
                 tiktoken.enc = tiktoken.encoding_for_model("gpt-4")
             return cls._instance
 
@@ -119,3 +119,4 @@ class AIEngine:
 #engine = AIEngine()
 #completion_result = engine.completion(messages, max_token_count)
 #embedding_result = engine.embedding(text)
+'''

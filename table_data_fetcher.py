@@ -29,18 +29,13 @@ class TableDataFetcher:
 
     def fill_table(self):
         """Coordinate the process of generating queries and filling the table."""
-      #  self.debug_print('Starting to fill table...')
-      #  print(self._is_table_filled())
-      #  print(self.retry_count)
-      #  print(self.overall_max_retries)
-      #  print(self.retry_count < self.overall_max_retries)
-      #  print("ENTERING FILLT ABLE")
+
         while (not self._is_table_filled()) and self.retry_count < self.overall_max_retries:
-            #save the current table to a markdown file
+       
             for cell,val in self.cells.items():
                 if val is not None:
-                    print(cell)
-                    print(val)
+                    self.debug_print(cell)
+                    self.debug_print(val)
     
             self.debug_print('FILL TABLE WHILE LOOP')
             try:

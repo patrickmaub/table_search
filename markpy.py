@@ -1,4 +1,4 @@
-import textwrap
+
 def format_as_markdown_table(data):
     # Extract headers and rows
     headers = set()

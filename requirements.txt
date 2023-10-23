@@ -1,0 +1,9 @@
+requests
+beautifulsoup4
+pdfplumber
+readability-lxml
+requests-html
+numpy
+scipy
+tiktoken  
+openai

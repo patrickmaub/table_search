@@ -1,40 +1,66 @@
-# TableSearch: Advanced Autofill System for Data Tables
+# TableSearch: Automated Data Table Completion with Precision
 
-TableSearch streamlines the process of populating data tables by automating the task of finding and filling in relevant information for each cell. It employs OpenAI's GPT-3.5-turbo to generate plausible synthetic strings, which are then used for semantic comparisons with online content, facilitating an efficient and accurate search.
+TableSearch is a groundbreaking solution that automates the filling of data tables by intelligently sourcing information and accurately inputting it into each cell. It harnesses the capabilities of OpenAI's GPT-3.5-turbo to generate synthetic strings that simulate potential content from the web. These strings are used in semantic comparisons with actual web data, ensuring a targeted and precise search process.
 
-## Workflow
+## System Workflow
 
 1. **Initialization:**
-   - The user begins by specifying a set of rows and columns or selecting from preset test tables. The system identifies the empty cells and initializes the `SearchQueryQueue` with these targets, guided by a user-defined prompt describing the needed information.
+   - Users begin by selecting from preset test tables or defining their own with specific rows, columns, and a guiding prompt. TableSearch identifies the empty cells in the table and prepares the `SearchQueryQueue` with these details.
 
-2. **Query Formulation:**
-   - The `QueryGenerator`, utilizing GPT-3.5-turbo, dynamically formulates search queries. These queries, tailored to the specific requirements of each row, column, table, or individual cell, are comprehensive, ensuring a high probability of retrieving relevant data.
-   - The `SearchQueryQueue` optimizes this process, tracking the status of queries and prioritizing them based on relevance and previous attempts.
+2. **Adaptive Query Formation:**
+   - The `QueryGenerator` utilizes GPT-3.5-turbo to craft context-aware search queries tailored to the specific requirements of each cell, row, column, or the entire table. These refined queries enhance the probability of retrieving relevant information.
+   - The `SearchQueryQueue` efficiently manages the lifecycle of these queries, prioritizing and handling retries based on predefined logic.
 
 3. **Semantic Matching:**
-   - The `SemanticsHandler` is pivotal at this stage. For each cell, it creates a synthetic string using GPT-3.5-turbo, reflecting potential online content. This string is then matched against actual website content retrieved through the queries, ranking these sites based on semantic similarity.
+   - Here, the `SemanticsHandler` steps in, using GPT-3.5-turbo to create a synthetic string for each cell, indicative of expected online content. This string is then compared with actual web content fetched through the queries, ranking these sources based on their semantic similarity.
 
 4. **Information Extraction and Validation:**
-   - Next, the `QuestionAnswerer` analyzes the top-ranked website content, verifying the presence of information pertinent to the empty cells. It ensures the extracted data's precision, matching it with the cell's contextual requirements.
+   - The `QuestionAnswerer` module analyzes the top-ranked web content to determine if it contains information that matches the context and requirements of the empty cells. This step is crucial in ensuring the accuracy and relevance of the information extracted.
 
 5. **Table Population:**
-   - Once validated, the information is used to complete the data table. Each cell's content is accompanied by a citation, including the source website and the relevant text snippet. This iterative process continues until all cells are filled or all feasible queries are used.
+   - Verified information is used to fill the data table. Each entry includes a citation with the source website and relevant content excerpt. This procedure continues until all cells are filled or all query options are exhausted.
 
 ## Key Components
 
-- `SearchQueryQueue`: Manages the lifecycle of search queries, enhancing efficiency.
-- `QueryGenerator`: Uses GPT-3.5-turbo to devise precise queries based on the table's demands.
-- `SemanticsHandler`: Constructs synthetic strings for semantic analysis, pinpointing the most relevant content sources.
-- `QuestionAnswerer`: Assures the accuracy of information extracted for table completion.
+- `SearchQueryQueue`: Coordinates the query process, enhancing search efficiency.
+- `QueryGenerator`: Uses GPT-3.5-turbo to develop context-sensitive queries.
+- `SemanticsHandler`: Produces synthetic strings and conducts semantic comparisons to pinpoint the most relevant content sources.
+- `QuestionAnswerer`: Validates and extracts suitable information from the chosen content to populate the data table.
 
-## Integrations
+## External Integrations
 
-- **OpenAI API**: Empowers synthetic string creation, semantic analysis, and embeddings via GPT-3.5-turbo.
-- **Google Search**: Acts as the primary reservoir for information retrieval.
+- **OpenAI API**: Essential for generating synthetic strings, conducting semantic analysis, and providing embeddings, all through GPT-3.5-turbo.
+- **Google Search**: Acts as the primary source for information retrieval.
 
-## Output and Usage
+## Usage and Output
 
-- The completed data table, along with source citations for each cell, is saved in a markdown (.md) file, ensuring easy readability and format consistency.
-- Users have the flexibility to either select from pre-defined test tables or define their own table structure and content requirements, enhancing the system's applicability across various scenarios.
+- The completed data table, along with citations, is saved in a markdown (.md) file, ensuring easy readability and review.
+- Users have the flexibility to choose from ready-made test tables or create their own, enhancing the system's applicability across various scenarios.
 
-TableSearch is an indispensable tool when it comes to tasks involving large-scale data table completion, where manual input is either unfeasible or prone to inconsistencies. It not only guarantees the reliability and coherence of the information retrieved but also significantly abbreviates the time and resources conventionally required for such tasks.
+TableSearch is indispensable in environments where filling extensive data tables accurately is crucial. It significantly reduces the time and effort involved, providing reliable, consistent, and precise data entries.
+
+## Running TableSearch
+
+Follow these steps to set up and run TableSearch:
+
+1. **Dependency Installation:**
+   - Ensure Python is installed on your system.
+   - In the project's root directory, install the necessary packages with:
+     ```
+     pip install -r requirements.txt
+     ```
+
+2. **Script Permission:**
+   - Grant the main script execution rights using:
+     ```
+     chmod +x main.py
+     ```
+
+3. **Script Execution:**
+   - Run TableSearch with the following command:
+     ```
+     ./main.py
+     ```
+   - You will receive prompts to either choose a predefined test table or specify your own parameters.
+
+Enjoy the power of automated, intelligent data table completion with TableSearch!

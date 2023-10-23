@@ -42,7 +42,59 @@ PRESET_TABLES = {
         "prompt": "Analyze the current academic performance metrics of major universities as of 2023. Include acceptance rates for 2023, changes in international student enrollment in 2023 compared to 2022, major awards or recognitions received in 2023, new courses or programs introduced in 2023, and planned campus developments for 2024.",
         "rows": ["Harvard University", "MIT", "University of Cambridge", "University of Oxford", "Stanford University", "Yale University", "Princeton University", "Imperial College London", "University of Chicago", "California Institute of Technology"],
         "columns": ["Acceptance Rate 2023 (%)", "Change in International Students", "Awards/Recognitions 2023", "New Courses/Programs 2023", "Planned Developments 2024"]
+    },
+    10: {
+        "prompt": "Find the highest-grossing movie globally in 2023.",
+        "rows": ["Highest Grossing Movie"],
+        "columns": ["Global Box Office (USD Billion)"]
+    },
+    11: {
+        "prompt": "Identify the book that won the Man Booker Prize in 2023.",
+        "rows": ["Man Booker Prize Winner"],
+        "columns": ["Book Title"]
+    },
+    12: {
+        "prompt": "Determine the city with the highest cost of living in 2023.",
+        "rows": ["City with Highest Cost of Living"],
+        "columns": ["City Name"]
+    },
+    13: {
+        "prompt": "Discover the most subscribed-to YouTube channel as of 2023.",
+        "rows": ["Most Subscribed YouTube Channel"],
+        "columns": ["Channel Name"]
+    },
+    14: {
+        "prompt": "Identify the person who was awarded the Nobel Peace Prize in 2023.",
+        "rows": ["Nobel Peace Prize"],
+        "columns": ["Winner's Name"]
+    },
+    15: {
+        "prompt": "Find the fastest production car in the world in 2023.",
+        "rows": ["Fastest Production Car"],
+        "columns": ["Car Model"]
+    },
+    16: {
+        "prompt": "Determine the best-selling video game globally in 2023.",
+        "rows": ["Best-selling Video Game"],
+        "columns": ["Game Title"]
+    },
+    17: {
+        "prompt": "Find the tallest building in the world as of 2023.",
+        "rows": ["Tallest Building"],
+        "columns": ["Building Name"]
+    },
+    18: {
+        "prompt": "Identify the most valuable publicly traded company in 2023.",
+        "rows": ["Most Valuable Company"],
+        "columns": ["Company Name"]
+    },
+    19: {
+        "prompt": "Discover the most visited tourist attraction in the world in 2023.",
+        "rows": ["Most Visited Tourist Attraction"],
+        "columns": ["Attraction Name"]
     }
+
+
 
 
 

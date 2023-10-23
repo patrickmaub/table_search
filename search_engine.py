@@ -160,8 +160,8 @@ class SearchEngine:
 
     def search(self, query):
         #print('SEARCHING FOR QUERY', query)
-        http_timeout = 10  # Timeout for the HTTP requests
-        split_timeout = 30  # Timeout for the content splitting
+        http_timeout = 5  # Timeout for the HTTP requests
+        split_timeout = 10  # Timeout for the content splitting
         content_results = []
         split_content_results = []
 

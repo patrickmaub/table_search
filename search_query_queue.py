@@ -17,11 +17,6 @@ class SearchQueryQueue:
         self.query_generator = QueryGenerator(self.cells,self.user_prompt)
         
     def update_cells (self, cells):
-
-       # print(cells)
-       # print(self.cells)
-       # print(type(cells))
-       # print(type(self.cells))
         self.cells = cells
 
     def add_query(self, query,target_cells):
@@ -93,7 +88,8 @@ class SearchQueryQueue:
             for col in columns:
                 for cell in self.cells:
                     if cell[0] == most_empty_row and cell[1] == col:
-                        target_cells.append(cell)
+                        if self.cells[cell]['Response'] is None:
+                            target_cells.append(cell)
 
             row_wise_queries = self.query_generator.generate(target_cells, self.exhausted_queries)
           #  print('ROW WISE QUERIES GENERATED: ')
@@ -129,8 +125,9 @@ class SearchQueryQueue:
             for row in rows:
                 for cell in self.cells:
                     if cell[0] == row and cell[1] == most_empty_col:
+                        if self.cells[cell]['Response'] is None:
                         
-                        target_cells.append(cell)
+                            target_cells.append(cell)
 
             column_wise_queries = self.query_generator.generate(target_cells, self.exhausted_queries)
 

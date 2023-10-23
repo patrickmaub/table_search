@@ -76,6 +76,7 @@ Your queries should be generalized across all of the cell(s) which are provided.
 Using the prompt as guidance, generate a list of search queries that will fill in the `List of Target Cells` with accurate values.
 Use search operators like quotes for exact phrases (e.g., "annual report 2022"), minus sign to exclude terms (e.g., solar -panels), filetype: for document types (e.g., filetype:pdf), and OR to combine searches (e.g., coffee OR tea) to refine your online searches wheere helpful.
 Your output must be a list of search queries, directly interpretable in Python as a list.
+Never generate more than 5 queries total. If you have more than 5 target cells, you should generate 5 queries that are general enough to fill in all of the target cells.
 """
 
     def _get_user_message_content(self, target,exhausted_queries):

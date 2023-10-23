@@ -3,12 +3,12 @@ from query_generator import QueryGenerator
 from search_query_queue import SearchQueryQueue
 from search_engine import SearchEngine
 from semantics_handler import SemanticsHandler
-
+from markpy import format_as_markdown_table
 
 class TableDataFetcher:
     """Fetches data to fill a table using a multi-level search strategy."""
 
-    def __init__(self, prompt, rows, columns, cells, debug=False, overall_max_retries=800):
+    def __init__(self, prompt, rows, columns, cells, debug=True, overall_max_retries=800):
         self.rows = rows
         self.columns = columns
         self.cells = cells
@@ -32,15 +32,19 @@ class TableDataFetcher:
 
         while (not self._is_table_filled()) and self.retry_count < self.overall_max_retries:
        
-            for cell,val in self.cells.items():
-                if val is not None:
-                    self.debug_print(cell)
-                    self.debug_print(val)
-    
-            self.debug_print('FILL TABLE WHILE LOOP')
+            #self.debug_print(format_as_markdown_table(self.cells))
+            total_cells = len(self.cells)
+            filled_cells = 0
+            for cell, value in self.cells.items():
+                if value['Response'] is not None:
+                    filled_cells += 1
+                    #self.debug_print(f'{cell}: {value}')
+                
+
+            #self.debug_print('FILL TABLE WHILE LOOP')
+            self.debug_print(f'Filled cells: {filled_cells}/{total_cells}')
             try:
                 self.query_queue.update_cells(self.cells)
-               # print('GOT HERE')
                 next_query_tuple = self.query_queue.get_next_query()
                 query, target_cells = next_query_tuple
 
@@ -58,25 +62,11 @@ class TableDataFetcher:
                # print('Retrieving results')
                 unprocessed_results = []
                 unprocessed_results = self.search_engine.search(query)
-              #  print('GOT UNPROCESSED RESULTS!')
-               # print(len(unprocessed_results))
-               # print(unprocessed_results[0])
-               # print('UNPROCESSED RESULTS')
-               # print(unprocessed_results)
+
                 target_cells_str_list = [str(cell) for cell in target_cells]
                 semantic_results = self.semantics_handler.compare_targets_to_results(target_cells=target_cells_str_list,chunks=unprocessed_results,desired_output_chunks= 5 )
-                #print('GOT SEMATNIC RESULTS')
-                #print(len(semantic_results))
-                #print(type(semantic_results))
-                #if len(semantic_results) > 0:
-                #    print('SEMANTIC RESULTS')
-                  #  print(semantic_results[0])
-              #  print(len(semantic_results))
-               # print('Results retrieved')
-               # print('type of unprocessed results', type(unprocessed_results))
-              #  print('type of semantic results', type(semantic_results))
-                #print(semantic_results)
-               # 
+   
+
                 updated_cells = {}
 
                 for cell, value in semantic_results.items():
@@ -97,17 +87,12 @@ class TableDataFetcher:
 
 
                         if matching_cell:
-                            #print('FOUND MATCHING CELL')
-                           # print(matching_cell)
-                          #  print(value)
+
                             updated_cells_per_item = self.question_answerer.process_results(
                                 value, matching_cell)
-                            #print('PROCESSED RESULTS')
-                        #print first 100 characters of str updated cells per item
-                       # print('updated cells per item LENGTH', )
-                      #  print(len(str(updated_cells_per_item)))
+
                         if updated_cells_per_item:
-                          #  print('UPDATED CELLS PER ITEM')
+
                             updated_cells.update(updated_cells_per_item)
                        
 
@@ -119,7 +104,7 @@ class TableDataFetcher:
                     self.debug_print('UPDATED CELLS')
                     for cell, value in updated_cells.items():
                         self.cells[cell].update(value)
-                        self.debug_print(f'Updated cells: {self.cells[cell]}')
+                        self.debug_print(f'{cell}: {self.cells[cell]}')
 
                 if self._is_table_filled():
                     break

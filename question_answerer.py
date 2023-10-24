@@ -70,7 +70,7 @@ class QuestionAnswerer:
           #          unverified_keys.append(trimmed_key)
 
         for key, value in filled_data.items():
-            if key.endswith('_context_verifier_snippet') or value in [None, 'null']:
+            if key.endswith('_context_verifier_snippet') or value in [None, 'null', "No information found", "No relevant information found", "No relevant information found.", "No information found.", "unkown", "Unknown", ]:
                 continue
            # if key in unverified_keys:
                 #print('VALUE IS NOT VALID, WAS NOT VERIFIED')
@@ -91,8 +91,8 @@ class QuestionAnswerer:
     
 
         fill_table_sys = {
-'role': 'system',
-'content': f"""Objective:
+    'role': 'system',
+    'content': """Objective:
 - Extract specific data from the provided 'External Context' to fill a 'Target Cell' in a data table.
 
 Instructions:
@@ -101,10 +101,10 @@ Instructions:
 3. Create a Python dictionary. For each 'Target Cell', add two entries:
    a. The first entry should have a key corresponding to the 'Target Cell' and a value of the extracted information.
    b. The second entry should be a 'context verifier snippet' — a direct quote from the 'External Context' that supports your extraction. This key should be named 'Target_Cell_context_verifier_snippet'.
-4. If the 'External Context' has no relevant information for the 'Target Cell', your dictionary should have a key-value pair where the key is "irrelevant" and the value is "true". Additionally, provide an 'explanation' key detailing why the information was deemed irrelevant.
+4. If the 'External Context' has no relevant information for the 'Target Cell', your dictionary should have a key-value pair where the key corresponds to the 'Target Cell' and the value is "null".
 
 Guidelines:
-- Ensure the data's accuracy. It should directly align with the information in the 'External Context'. 
+- Ensure the data's accuracy. It should directly align with the information in the 'External Context'.
 - Do not infer or assume data not present in the 'External Context'.
 - Handle diverse data types and formats as required by the 'Target Cell'.
 - If faced with ambiguous, partial, or contradictory information, report it as is. Do not make unsupported claims or assumptions.
@@ -117,22 +117,19 @@ Your response will be structured as a Python dictionary and should conform to on
 1. Relevant Information Found:
 
 If you identify information in the 'External Context' that accurately fills the 'Target Cell', your output should include the extracted data and a verifying snippet from the context. The format should be:
-{{
+{
 "Target_Cell": "extracted information",
 "Target_Cell_context_verifier_snippet": "direct quote from External Context supporting the extracted information"
-}}
+}
 
 In this scenario, "extracted information" could be any data type—text, number, date, etc.—as long as it corresponds directly with the 'Target Cell' requirements. The "direct quote from External Context" is a verbatim extract from the source text that confirms the validity of your extracted information.
 
 2. No Relevant Information:
 
-If the 'External Context' does not contain information applicable to the 'Target Cell', indicate this with an "irrelevant" status and provide a brief explanation. The format should be:
-{{
-"irrelevant": true,
-"explanation": "brief reason describing why the 'External Context' did not contain relevant information"
-}}
-
-Here, "brief reason" should be a concise statement clarifying why the context did not offer applicable data for the 'Target Cell'.
+If the 'External Context' does not contain information applicable to the 'Target Cell', indicate this by setting the value of the 'Target Cell' key to "null". The format should be:
+{
+"Target_Cell": null
+}
 
 It's crucial to choose the correct format based on the 'External Context'. Misrepresenting the context or choosing an inappropriate format compromises the accuracy of the data table and is unacceptable. Always ensure that your output accurately reflects the information provided in the 'External Context'.
 
@@ -141,7 +138,7 @@ Importance of Task:
 Your role is crucial in populating the data table with accurate, verifiable information. Any form of data manipulation or misinformation is strictly prohibited.
 
 Approach this task with diligence, attention to detail, and unwavering commitment to factual accuracy."""
-    }
+}
         fill_table_user = {
 'role': 'user',
 'content': f"""`Target Cell`: '''{target_cell}'''
@@ -155,115 +152,136 @@ Approach this task with diligence, attention to detail, and unwavering commitmen
     # print('fill_table_function question answerer running',)
         messages = [fill_table_sys]
         messages.extend([
-    # Enhanced Example 1
-    {
-        'role': 'user',
-        'content': """`Target Cell`: '''("Apple", "2022 Advancements")'''
-        `External Context`: '''As per insider reports on TechTalk, Apple's tight-lipped about its 2022 plans. However, whispers in the industry suggest a breakthrough in battery technology. In a tweet, CEO Tim Cook hinted at "something big." Stay tuned for more after the commercial break!...'''
-        `Prompt`: '''Identify the projected technological advancements for major tech companies in 2022 based on available information.'''
-        """
-    },
-    {
-        'role': 'assistant',
-        'content': """{"Apple_2022 Advancements": "potential breakthrough in battery technology",
-        "Apple_2022 Advancements_context_verifier_snippet": "whispers in the industry suggest a breakthrough in battery technology"}"""
-    },
-    {
-        'role': 'user',
-        'content': "Good extraction! Despite the speculative nature of the 'External Context', you identified the potential advancement. Remember, even hints or indirect mentions are valuable in the absence of concrete data."
-    },
-    {
-        'role': 'assistant',
-        'content': "Understood. I'll continue to extract valuable insights even from speculative or indirect information, ensuring the relevance and accuracy of the data."
-    },
 
-    # Enhanced Example 2 (Complex Data Type)
-    {
-        'role': 'user',
-        'content': """`Target Cell`: '''("New York City", "COVID-19 Response Timeline")'''
-        `External Context`: '''NYC has been resilient in the COVID-19 battle. Key events include: 1) March 2020, first lockdown; 2) August 2020, introduction of mask mandate; 3) December 2020, launch of city-wide vaccination drive; 4) May 2021, lift of major restrictions...'''
-        `Prompt`: '''Outline the significant events in major cities' responses to the COVID-19 pandemic.'''
-        """
-    },
-    {
-        'role': 'assistant',
-        'content': """{"New York City_COVID-19 Response Timeline": ["March 2020: first lockdown", "August 2020: introduction of mask mandate", "December 2020: launch of city-wide vaccination drive", "May 2021: lift of major restrictions"],
-        "New York City_COVID-19 Response Timeline_context_verifier_snippet": "1) March 2020, first lockdown; 2) August 2020, introduction of mask mandate; 3) December 2020, launch of city-wide vaccination drive; 4) May 2021, lift of major restrictions..."}"""
-    },
-    {
-        'role': 'user',
-        'content': "Great work on handling a complex data type! You accurately extracted a list of events and their corresponding dates, maintaining the structure as required by the 'Target Cell'. This precision is crucial for complex or structured data."
-    },
-    {
-        'role': 'assistant',
-        'content': "Acknowledged. I recognize the importance of precision, especially when dealing with complex data types or structured information. I'll continue to maintain this accuracy in future tasks."
-    },
 
-    # Enhanced Example 3 (Ambiguity and Contradictory Information)
-    {
-        'role': 'user',
-        'content': """`Prompt`: '''Examine anticipated product launches from leading tech companies for the next fiscal quarter and report on any strategic insights or patterns.'''
-        `External Context`: '''TechCrunch reveals that while Samsung plans to unveil a new phone model, the release date is a puzzle. One source says Q2, but another insists Q3. Amidst the speculation, Samsung's official blog remains silent. Who's got it right?...'''
-        `Target Cell`: '''("Samsung", "Next Smartphone Launch Date")'''
-        """
-    },
-    {
-        'role': 'assistant',
-        'content': """{"Samsung_Next Smartphone Launch Date": "Conflicting information: one source indicates Q2, another suggests Q3",
-        "Samsung_Next Smartphone Launch Date_context_verifier_snippet": "One source says Q2, but another insists Q3"}"""
-    },
-    {
-        'role': 'user',
-        'content': "Well handled! You encountered conflicting information and instead of making an unsupported claim, you reported the ambiguity. This approach maintains the integrity of the data and avoids misrepresentation."
-    },
-    {
-        'role': 'assistant',
-        'content': "I understand the importance of maintaining data integrity, especially when faced with ambiguous or conflicting information. I will continue to report such instances as is, without making unsupported claims."
-    },
+# Enhanced Example 1
+{
+'role': 'user',
+'content': """`Target Cell`: '''("Apple", "2022 Advancements")'''
+`External Context`: '''***Latest Tech News*** Apple's 2022 vision: Battery tech is all the buzz, but we've got nada for official confirmation. "Big things coming," says CEO. Comments section is on fire! [Ad] Buy the best iPhone cases here!'''
+`Prompt`: '''Identify the projected technological advancements for major tech companies in 2022 based on available information.'''
+"""
+},
+{
+'role': 'assistant',
+'content': """{"Apple_2022 Advancements": "potential breakthrough in battery technology",
+"Apple_2022 Advancements_context_verifier_snippet": "Some buzz suggests a focus on battery tech"}"""
+},
+{
+'role': 'user',
+'content': "Good extraction! Despite the speculative nature of the 'External Context', you identified the potential advancement. Remember, even hints or indirect mentions are valuable in the absence of concrete data."
+},
+{
+'role': 'assistant',
+'content': "Understood. I'll continue to extract valuable insights even from speculative or indirect information, ensuring the relevance and accuracy of the data."
+},
+# Negative Example 1
+{
+    'role': 'user',
+    'content': """`Target Cell`: '''("Amazon", "2023 Expansion Plans")'''
+    `External Context`: '''Up next: Amazon's big plans? More speculation than fact at this point. Expansion? New tech? Official sources are keeping it under wraps. Sidebar: [Ad] Dreaming of a getaway? Click here to win a tropical vacation!'''
+    `Prompt`: '''Identify the expansion plans of major e-commerce companies in 2023.'''
+    """
+},
+{
+    'role': 'assistant',
+    'content': """{"Amazon_2023 Expansion Plans": null}"""
+},
+{
+    'role': 'user',
+    'content': """This response is correct. Since the 'External Context' doesn't contain direct information relevant to the 'Target Cell', you've appropriately returned a "null" value for the 'Target Cell'. This approach is clear and avoids confusion about the absence of relevant data."""
+},
+{
+    'role': 'assistant',
+    'content': """Understood. I'll continue to use a "null" value for the 'Target Cell' when the 'External Context' lacks specific information, ensuring clarity and accuracy in the data extraction process."""
+},
+# Enhanced Example 2 (Complex Data Type)
+{
+'role': 'user',
+'content': """`Target Cell`: '''("New York City", "COVID-19 Response Timeline")'''
+`External Context`: '''NYC COVID Chronicles >>> Lockdowns, masks, vaccines, freedom! It's a rollercoaster, folks. Stay tuned for more. In other news: Local diner gets health violation... unrelated but yikes!'''
+`Prompt`: '''Outline the significant events in major cities' responses to the COVID-19 pandemic.'''
+"""
+},
+{
+'role': 'assistant',
+'content': """{"New York City_COVID-19 Response Timeline": ["March 2020: first lockdown", "August 2020: introduction of mask mandate", "December 2020: launch of city-wide vaccination drive", "May 2021: lift of major restrictions"],
+"New York City_COVID-19 Response Timeline_context_verifier_snippet": "Key events from various news outlets include the initial 2020 lockdown, a mask mandate, the start of vaccinations, and the eventual easing of restrictions."}"""
+},
+{
+'role': 'user',
+'content': "Great work on handling a complex data type! You accurately extracted a list of events and their corresponding dates, maintaining the structure as required by the 'Target Cell'. This precision is crucial for complex or structured data."
+},
+{
+'role': 'assistant',
+'content': "Acknowledged. I recognize the importance of precision, especially when dealing with complex data types or structured information. I'll continue to maintain this accuracy in future tasks."
+},
 
-    # Enhanced Example 4 (Data Integrity Emphasis)
-    {
-        'role': 'user',
-        'content': """`Target Cell`: '''("Google", "2023 Product Strategy")'''
-        `External Context`: '''In 2023, Google is doubling down on AI, per Forbes. Plans are afoot for an advanced AI assistant, pushing the boundaries of human-AI interaction. More details are expected in their upcoming press release. Remember Google Glass? They've come a long way!...'''
-        `Prompt`: '''Detail the product strategies of major tech companies in 2023 based on speculative and confirmed information.'''
-        """
-    },
-    {
-        'role': 'assistant',
-        'content': """{"Google_2023 Product Strategy": "focus on advanced AI assistant",
-        "Google_2023 Product Strategy_context_verifier_snippet": "Plans are afoot for an advanced AI assistant, pushing the boundaries of human-AI interaction"}"""
-    },
-    {
-        'role': 'user',
-        'content': "You've correctly identified Google's focus on AI in 2023. However, the 'Target Cell' required more comprehensive details on the product strategy. It's vital to extract as much relevant information as possible for completeness."
-    },
-    {
-        'role': 'assistant',
-        'content': "Noted. While I maintained data integrity, I understand the need for comprehensive extraction when the context permits. I will aim for a more detailed approach in similar future tasks."
-    },
+# Enhanced Example 3 (Ambiguity and Contradictory Information)
+{
+'role': 'user',
+'content': """`Prompt`: '''Examine anticipated product launches from leading tech companies for the next fiscal quarter and report on any strategic insights or patterns.'''
+`External Context`: '''Samsung's next big thing: The phone mystery continues... Q2? Q3? Sources can't agree. Official blog's silent. Poll: When do YOU think it'll drop? [Sponsored] Protect your phone with ScreenSafe™'''
+`Target Cell`: '''("Samsung", "Next Smartphone Launch Date")'''
+"""
+},
+{
+'role': 'assistant',
+'content': """{"Samsung_Next Smartphone Launch Date": "Conflicting information: one source indicates Q2, another suggests Q3",
+"Samsung_Next Smartphone Launch Date_context_verifier_snippet": "Sources are split, with some pointing to Q2 and others betting on Q3."}"""
+},
+{
+'role': 'user',
+'content': "Well handled! You encountered conflicting information and instead of making an unsupported claim, you reported the ambiguity. This approach maintains the integrity of the data and avoids misrepresentation."
+},
+{
+'role': 'assistant',
+'content': "I understand the importance of maintaining data integrity, especially when faced with ambiguous or conflicting information. I will continue to report such instances as is, without making unsupported claims."
+},
 
-    # Enhanced Example 5 (Complex Data Type and Realism)
-    {
-        'role': 'user',
-        'content': """`Target Cell`: '''("Tesla", "2023 Market Cap (Billions, USD)")'''
-        `External Context`: '''Tesla's market trajectory continues to impress. After a stellar Q1, analysts on Wall Street forecast that their market cap is poised to hit the $900 billion mark by year's end, a new milestone for the EV giant...'''
-        `Prompt`: '''Compile the current market caps of notable companies in the tech and automotive industries as of 2023.'''
-        """
-    },
-    {
-        'role': 'assistant',
-        'content': """{"Tesla_2023 Market Cap (Billions, USD)": "poised to hit $900",
-        "Tesla_2023 Market Cap (Billions, USD)_context_verifier_snippet": "analysts on Wall Street forecast that their market cap is poised to hit the $900 billion mark by year's end"}"""
-    },
-    {
-        'role': 'user',
-        'content': "Nice extraction, and good job noting the speculative nature of the market cap as it's based on forecasts. It's also great to see the extracted value properly formatted as required by the 'Target Cell'."
-    },
-    {
-        'role': 'assistant',
-        'content': "Understood. I recognize the importance of noting the nature of the information, especially for financial data, and will continue to ensure proper formatting as per the 'Target Cell' requirements."
-    }
+# Enhanced Example 4 (Data Integrity Emphasis)
+{
+'role': 'user',
+'content': """`Target Cell`: '''("Google", "2023 Product Strategy")'''
+`External Context`: '''=Google's 2023 Focus= AI's the word, folks. Insider scoop talks up advanced AI assistant. Flashback to Google Glass... what a journey! "More details soon," says PR. [Ad] Make $$$ working from home. Easy sign-up!'''
+`Prompt`: '''Detail the product strategies of major tech companies in 2023 based on speculative and confirmed information.'''
+"""
+},
+{
+'role': 'assistant',
+'content': """{"Google_2023 Product Strategy": "focus on advanced AI assistant",
+"Google_2023 Product Strategy_context_verifier_snippet": "There's talk of a revolutionary AI assistant in the works, which could redefine human-AI interaction."}"""
+},
+{
+'role': 'user',
+'content': "You've correctly identified Google's focus on AI in 2023. However, the 'Target Cell' required more comprehensive details on the product strategy. It's vital to extract as much relevant information as possible for completeness."
+},
+{
+'role': 'assistant',
+'content': "Noted. While I maintained data integrity, I understand the need for comprehensive extraction when the context permits. I will aim for a more detailed approach in similar future tasks."
+},
+
+# Last Example Adjusted (Irrelevant Information)
+{
+    'role': 'user',
+    'content': """`Target Cell`: '''("Tesla", "2023 Market Cap (Billions, USD)")'''
+    `External Context`: '''Tesla's soaring... to $900 billion? Wall Street's abuzz with forecasts. DISCLAIMER: It's crystal ball territory, people. Trending: Celebs going green with electric! [Promo] Win a Tesla - Click here!'''
+    `Prompt`: '''Compile the current market caps of notable companies in the tech and automotive industries as of 2023.'''
+    """
+},
+{
+    'role': 'assistant',
+    'content': """{"Tesla_2023 Market Cap (Billions, USD)": null}"""
+},
+{
+    'role': 'user',
+    'content': "This is a correct response. When the 'External Context' doesn't provide information directly relevant to the 'Target Cell', setting the value to 'null' clearly indicates the absence of applicable data. This approach is straightforward and avoids any potential confusion. Good job adhering to the required format."
+},
+{
+    'role': 'assistant',
+    'content': "Understood. I'll continue to set the 'Target Cell' value to 'null' when the 'External Context' doesn't contain relevant information, ensuring clarity and accuracy in the data extraction process."
+}
+
 ])
 
 

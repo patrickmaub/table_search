@@ -16,6 +16,8 @@ class SearchQueryQueue:
         self.user_prompt = user_prompt
         self.query_generator = QueryGenerator(self.cells,self.user_prompt)
         self.last_query_type = "none"
+        self.min_for_table_wide_search = 150
+        self.min_for_row_col_search = 5
         
     def update_cells (self, cells):
         self.cells = cells
@@ -63,12 +65,12 @@ class SearchQueryQueue:
             if cell[1] not in columns:
                 columns.append(cell[1])
 
-        if num_empty_cells > 150:
+        if num_empty_cells > self.min_for_table_wide_search:
             target_cells = sorted([cell for cell in self.cells.values() if cell['Response'] is None], key=lambda x: x['Attempts'])[:50]
             table_wide_queries = self.query_generator.generate(target_cells, self.exhausted_queries)
             for query in table_wide_queries:
                 self.add_query(query, target_cells)
-        elif num_empty_cells > 30:
+        elif num_empty_cells > self.min_for_row_col_search:
             # Alternate between row-wise and column-wise queries
             if self.last_query_type in ["none", "column"]:
                 # Generate row-wise queries

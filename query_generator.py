@@ -89,10 +89,10 @@ Remember, your role is crucial for accruing accurate, relevant data efficiently.
 
 
     def _get_user_message_content(self, target,exhausted_queries):
-        print('GENERATE QUERIES FOR')
-        print(target)
-        print("EXHAUSTED QUERIES")
-        print(exhausted_queries)
+       # print('GENERATE QUERIES FOR')
+       # print(target)
+       # print("EXHAUSTED QUERIES")
+       # print(exhausted_queries)
         return f"""Context: 
 `Prompt`: '''{self.prompt}'''
 
@@ -103,148 +103,110 @@ Remember, your role is crucial for accruing accurate, relevant data efficiently.
 {"`Previous Attempts`: '''"if len(exhausted_queries) > 0  else ""}{exhausted_queries if len(exhausted_queries) > 0  else ""}{" '''"if len(exhausted_queries) > 0  else ""}
 """
     def get_examples(self):
-        return  [
-    # Example 1
+        return [
+    # Example 1: Multi-Target, Comprehensive Query
     {
         'role': 'user',
-        'content': """`Prompt`: '''Provide detailed nutritional information on apples, focusing on their origin, vitamin C content, dietary fiber, and sugar levels. Ensure the data comes from credible sources, preferably scientific studies or official nutritional databases.'''
+        'content': """`Prompt`: '''Detail the advancements of social media platforms in 2023, focusing on user base growth, innovative features introduced, and demographic shifts. Prioritize information from official company reports, reputable tech news outlets, or statistical research organizations.'''
 `List of Target Cells`: 
 '''
-Cell 1: Apple, Origin Country
-Cell 2: Apple, Vitamin C Content mg per 100g
-Cell 3: Apple, Dietary Fiber Content g per 100g
-Cell 4: Apple, Sugar Content g per 100g
+Cell 1: Social Media Advancements 2023, User Base Growth
+Cell 2: Social Media Advancements 2023, Innovative Features
+Cell 3: Social Media Advancements 2023, Demographic Shifts
 '''
-`Previous Attempts`: '''"origin of apples", "apple vitamin C content", "apples dietary fiber content", "how much sugar in an apple"'''"""
+`Previous Attempts`: '''"social media statistics 2023", "new features in social media 2023", "2023 social media user demographics", "growth trends among social media platforms 2023"'''"""
     },
     {
         'role': 'assistant',
         'content': """[
-"comprehensive nutritional profile of apples",
-"scientific analysis of apple nutritional values",
-"apple nutritional facts from official databases",
-"research papers on apple nutrition"
+"2023 social media industry report: user growth, innovation, demographic trends",
+"comprehensive review of social media platforms' advancements in 2023",
+"statistical analysis of social media trends in 2023: user base, innovation, demographics",
+"official 2023 social media reports on user growth, new features, and demographic shifts"
 ]"""
     },
     {
         'role': 'user',
-        'content': """Great work! These queries are broad enough to potentially provide information for all the target cells simultaneously, which is more efficient than addressing each cell individually. Remember, the goal is to fill in all target cells with as few queries as possible, so always think about how you can maximize the potential of each query."""
+        'content': """These queries are well-constructed and aim to provide comprehensive insights into all the target cells at once. This method is efficient and likely to yield detailed information from credible sources. Remember, the goal is to minimize the number of queries while maximizing the amount of relevant information retrieved."""
     },
     {
         'role': 'assistant',
-        'content': """Understood, the focus is on crafting efficient, broad queries that can yield comprehensive information capable of filling multiple target cells at once. This approach maximizes the utility of each query and improves overall efficiency."""
+        'content': """Understood. The focus is on crafting precise, all-encompassing queries capable of retrieving detailed and relevant data for all target cells simultaneously, ensuring an efficient and comprehensive search process."""
     },
 
-    # Example 2
+    # Example 2: Single-Target, Specific Query
     {
         'role': 'user',
-        'content': """`Prompt`: '''I need specifics on the Tesla Model 3's performance and specifications. Details such as the origin country, battery life, acceleration, maximum speed, and price are crucial. Only use recent, official, or well-regarded automotive sources for the most accurate information.'''
+        'content': """`Prompt`: '''Investigate the performance of electric vehicles (EVs) in 2023, specifically regarding their battery life improvements, environmental impact, and market share growth. Information should be sourced from industry analyses, environmental research, or authoritative automotive studies.'''
 `List of Target Cells`: 
 '''
-Cell 1: Tesla Model 3, Origin Country
-Cell 2: Tesla Model 3, Battery Life
-Cell 3: Tesla Model 3, 0 to 60 mph Acceleration Time
-Cell 4: Tesla Model 3, Maximum Speed
-Cell 5: Tesla Model 3, Price
+Cell 1: EV Performance 2023, Battery Life Improvements
 '''
-`Previous Attempts`: '''"Tesla Model 3 origin", "Tesla Model 3 battery lifespan", "Tesla Model 3 acceleration stats", "Tesla Model 3 top speed", "Tesla Model 3 current price"'''"""
+`Previous Attempts`: '''"EV battery advancements 2023", "2023 electric vehicle battery lifespan", "improvements in EV battery technology 2023"'''"""
     },
     {
         'role': 'assistant',
         'content': """[
-"Tesla Model 3 complete specifications and performance review",
-"Tesla Model 3 official specs from manufacturer",
-"comprehensive review and analysis of Tesla Model 3 features",
-"latest reports on Tesla Model 3 performance metrics",
-"Tesla Model 3 pricing and performance comparison"
+"2023 industry analysis on electric vehicle battery performance enhancements",
+"research on advancements in EV battery life and technology in 2023",
+"authoritative 2023 studies on EV battery longevity improvements",
+"environmental impact of improved EV batteries in 2023"
 ]"""
     },
     {
         'role': 'user',
-        'content': """These queries are well-crafted and likely to return comprehensive resources on the Tesla Model 3's specifications. You've effectively used broad terms that encourage the return of sources with multiple pieces of information relevant to the different target cells. This strategy is excellent for efficiency and accuracy."""
+        'content': """These queries are targeted and specific, focusing on the exact information required for the single target cell. When dealing with a specific piece of information, it's crucial to tailor your queries precisely, ensuring high relevance and accuracy in the search results."""
     },
     {
         'role': 'assistant',
-        'content': """Acknowledged, I will continue to formulate queries that are likely to yield comprehensive and multifaceted information, fulfilling multiple target cells at once and ensuring efficiency in the search process."""
+        'content': """Acknowledged. When the task involves specific information retrieval, I'll ensure the queries are highly targeted to accurately address the precise requirements of the target cell, enhancing the relevance and precision of the search results."""
     },
 
-    # Example 3
+    # Instructional Example: Assistant Misunderstands the Task, Then Corrects
     {
         'role': 'user',
-        'content': """`Prompt`: '''I'm researching historical climate patterns in Tokyo. I need the average annual temperature over the past decade. Data should be sourced from official meteorological resources or scientific studies for accuracy.'''
+        'content': """`Prompt`: '''Analyze the technological advancements in renewable energy sectors in 2023, emphasizing solar and wind energy improvements, cost-efficiency ratios, and global adoption rates. Seek out data from industry reports, technological reviews, or authoritative energy research institutes.'''
 `List of Target Cells`: 
 '''
-Cell 1: Tokyo, Average Annual Temperature
+Cell 1: Renewable Energy 2023, Solar Energy Improvements
+Cell 2: Renewable Energy 2023, Wind Energy Improvements
+Cell 3: Renewable Energy 2023, Cost-Efficiency
+Cell 4: Renewable Energy 2023, Global Adoption Rates
 '''
-`Previous Attempts`: '''"Tokyo average temperature", "Tokyo climate patterns", "average weather Tokyo", "Tokyo temperature data"'''
-        """
+`Previous Attempts`: '''"2023 renewable energy advancements", "solar and wind energy improvements 2023", "renewable energy cost-efficiency 2023 statistics", "global adoption of renewable energy 2023"'''"""
     },
     {
         'role': 'assistant',
         'content': """[
-"Tokyo decade-long average annual temperature official report",
-"scientific studies on Tokyo's historical climate patterns",
-"meteorological data on Tokyo's yearly temperatures",
-"climate change impact on temperatures in Tokyo over the past decade"
+"solar energy technological advancements in 2023",
+"wind energy efficiency improvements 2023",
+"cost reduction in renewable energy sectors 2023",
+"2023 renewable energy adoption rates worldwide"
 ]"""
     },
     {
         'role': 'user',
-        'content': """These queries are well-framed, aiming directly at the required information with a high probability of retrieving data from credible and official sources. When the target is very specific, as in this single-cell case, it's vital to craft queries that are equally precise to ensure the accuracy and relevance of the information obtained."""
-    },
-    {
-        'role': 'assistant',
-        'content': """Understood, precision is key in situations with highly specific targets. Crafting queries that align closely with the required information ensures that the results are both relevant and accurate, drawing from credible sources."""
-    },
-
-    # Counter-Example
-    {
-        'role': 'user',
-        'content': """`Prompt`: '''Compile a comprehensive comparison of major US airlines' reimbursement policies for flight delays and cancellations. Focus on standard practices and legal obligations.'''
-`List of Target Cells`: 
-'''
-Cell 1: Delta Airlines, Reimbursement Criteria
-Cell 2: American Airlines, Reimbursement Criteria
-Cell 3: Southwest Airlines, Reimbursement Criteria
-Cell 4: United Airlines, Reimbursement Criteria
-Cell 5: JetBlue Airways, Reimbursement Criteria
-'''
-`Previous Attempts`: '''"Delta Airlines delay policy", "American Airlines delay compensation", "Southwest Airlines flight cancellation rights", "United Airlines passenger reimbursement", "JetBlue delay compensation procedures"'''"""
+        'content': """While these queries are related to the target cells, they are individualized and might not return comprehensive results that cover all aspects we're interested in. We need more encompassing queries that can potentially provide information for all target cells. Try to create queries that collectively address solar and wind energy improvements, cost-efficiency, and global adoption rates in 2023, and ensure the sources are credible."""
     },
     {
         'role': 'assistant',
         'content': """[
-"Delta Airlines passenger delay compensation policy",
-"American Airlines reimbursement criteria for travel disruptions",
-"Southwest Airlines policy for delayed flights compensation",
-"United Airlines passenger rights for flight cancellations",
-"JetBlue Airways compensation procedures in event of delays"
+"comprehensive 2023 industry report on renewable energy: solar and wind advancements, cost-efficiency, global adoption",
+"2023 technological review of renewable energy sectors: improvements, economics, and worldwide acceptance",
+"authoritative energy research institutes' publications on 2023 renewable energy landscape: solar, wind, cost-efficiency, adoption",
+"2023 renewable energy breakthroughs: comprehensive analysis of technology, costs, and global trends"
 ]"""
     },
     {
         'role': 'user',
-        'content': """While these queries are detailed, they're not the most efficient approach given the task at hand. We're looking for comprehensive information across multiple airlines, not isolated data from individual airlines. A more effective strategy involves broader queries potentially encapsulating all target cells, making the search more efficient. Try to formulate queries that could return sources comparing or discussing reimbursement policies across these airlines. Remember, the goal is to fill in all target cells with as few queries as possible."""
+        'content': """Excellent adjustment! These queries are now structured to potentially source comprehensive information on all target cells from authoritative sources. By combining key topics (solar and wind improvements, cost-efficiency, global adoption) in one query, we're more likely to find sources that discuss these aspects collectively, increasing the efficiency and effectiveness of our search."""
     },
     {
         'role': 'assistant',
-        'content': """[
-"comparison of US airlines' delay and cancellation reimbursement policies",
-"passenger rights for flight disruptions across major US airlines",
-"overview of compensation criteria for flight delays among top US airlines",
-"guide to seeking reimbursement for flight cancellations from US airlines",
-"how do Delta, American, Southwest, United, JetBlue handle flight delay compensations"
-]"""
-    },
-    {
-        'role': 'user',
-        'content': """Excellent adjustment! These queries are much more likely to lead us to comprehensive sources that cover all the airlines listed, rather than individual pages for each airline. This approach is not only more efficient but also aligns with our goal of generating overarching queries that can fill multiple target cells simultaneously."""
-    },
-    {
-        'role': 'assistant',
-        'content': """Acknowledged, the emphasis is on maximizing the efficiency of each query by seeking comprehensive sources capable of addressing multiple target cells. This approach not only saves time but also increases the likelihood of finding consistent, comparative information."""
+        'content': """Understood, the emphasis is on crafting multifaceted queries capable of sourcing information that spans across all target cells. This approach not only ensures a more comprehensive collection of data but also enhances the efficiency of the search process by potentially reducing the number of required queries."""
     }
-
 ]
+
 
 
 

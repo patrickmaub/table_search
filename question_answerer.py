@@ -68,10 +68,14 @@ class QuestionAnswerer:
            #     trimmed_key = key.replace('_context_verifier_snippet', '')
             #    if value not in str(result):
           #          unverified_keys.append(trimmed_key)
-
+        invalid_responses = ['null', "No information found", "No relevant information found", "No relevant information found.", "No specific information", "No information found.", "unkown", "Unknown", "No specific information available" ]
         for key, value in filled_data.items():
             if key.endswith('_context_verifier_snippet') or value in [None, 'null', "No information found", "No relevant information found", "No relevant information found.", "No information found.", "unkown", "Unknown", ]:
                 continue
+            #filter out invalid resopnses
+            if value in invalid_responses:
+                continue
+           
            # if key in unverified_keys:
                 #print('VALUE IS NOT VALID, WAS NOT VERIFIED')
               #  continue

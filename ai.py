@@ -4,7 +4,7 @@ import tiktoken
 #openai.api_type = "azure"
 ##openai.api_base = "https://shazureopenai.openai.azure.com/"
 #openai.api_version = "2023-07-01-preview"
-openai.api_key = "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"
+openai.api_key = ""
 
 tiktoken.enc = tiktoken.encoding_for_model("gpt-4")
 

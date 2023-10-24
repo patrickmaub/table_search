@@ -41,11 +41,12 @@ class QueryGenerator:
         ]
         query_message.extend(examples)
         query_message.append({"role": "user", "content": user_message_content})
+        print(len(query_message))
 
         # Generate query using the AI completion function
-        query_response = completion(query_message, 1000,temperature=0.8)  # Adjust the second parameter as per your requirements
-     #   print('QUERYR ESPONSE')
-     #   print(query_response)
+        query_response = completion(query_message, 1000,temperature=0.5)  # Adjust the second parameter as per your requirements
+        print('GENERATED QUERIES')
+        print(query_response)
         # Parse the response to extract queries
         if '[' in query_response and ']' in query_response:
             query_response = literal_eval(query_response)
@@ -61,25 +62,37 @@ class QueryGenerator:
         Format the target cells into a string that can be used in the prompt.
         """
         target_cells_string = ""
+        print('Formatting the following target cells for query generation: ')
+        print(target_cells)
         for i,cell in enumerate(target_cells):
+            
             #print(cell)
             target_cells_string += f"Cell {i+1}: {cell[0]}, {cell[1]}\n"
         return target_cells_string
     def _get_system_message_content(self, exhausted_queries):
-        # Here you can customize the message based on the search type if needed
-        return f"""You are a master of the internet. You can find anything you want online. You can find the most obscure information, and you can find it fast. You are a search engine wizard.
-You are tasked with creating specific search queries to fill out a `List of Target Cells` based on the given structure and topic. For each of the queries you generate, you must also specify which cells in the `List of Target Cells` you aim to fill with that query.
-With your google search queries, you're aiming to fill out the following cell(s):
-The objective is to fill in the`List of Target Cells` with as few search queries as possible. So, generate queries that are as specific as possible to the target cells and prompt. Narrowing down the search space will help you find the correct values faster - use search operators liberally in your queries, to produce the most precise results.
-Your queries should be generalized across all of the cell(s) which are provided. For example, if you are provided with a single cell, your query should be highly specific utililizing search operators and keywords to weed out non-relevant results. If you are provided with multiple cells, your query should be more general, and should be able to produce results that are relevant to all of the cells provided.
-{"Here's an important note: You are STRICTLY FORBIDDEN from using any of the queries which appear in the previous provided to you. If your search queries are already in the list of previous attempts, those queries will be immediately rejected. Use your previous attempts as knowledge, and refine your future queries based on the fact you know the previous attempts did not work." if len(exhausted_queries) > 0  else ""}
-Using the prompt as guidance, generate a list of search queries that will fill in the `List of Target Cells` with accurate values.
-Use search operators like quotes for exact phrases (e.g., "annual report 2022"), minus sign to exclude terms (e.g., solar -panels), filetype: for document types (e.g., filetype:pdf), and OR to combine searches (e.g., coffee OR tea) to refine your online searches wheere helpful.
-Your output must be a list of search queries, directly interpretable in Python as a list.
-Never generate more than 5 queries total. If you have more than 5 target cells, you should generate 5 queries that are general enough to fill in all of the target cells.
-"""
+    # Customize the message based on the search type if needed
+        return f"""As an adept internet navigator, you have the prowess to swiftly locate precise information online, even if it's obscure. Your mission is to craft pinpointed search queries to populate a `List of Target Cells`, each tailored to the specific topic and structure provided.
+
+Key Objectives:
+1. **Efficiency**: Aim to complete the `List of Target Cells` with the fewest queries. Precision is paramount—utilize search operators to refine results.
+2. **Generalization vs. Specificity**: Your queries must strike a balance. A single cell requires a highly targeted query, while multiple cells necessitate a broader approach, potentially encompassing all information in one source.
+3. **Learning from Past Attempts**: {('Note the unsuccessful queries: ' + ', '.join(exhausted_queries) + '. Your new suggestions must not replicate these fruitless efforts.') if len(exhausted_queries) > 0 else 'No previous attempts yet. Start with fresh, strategic queries.'}
+4. **Search Operators**: Enhance query effectiveness with operators like quotes for exact matches, the minus sign for exclusions, 'filetype:' for specific documents, and 'OR' for alternative terms.
+5. **Query Limit**: Restrict your submission to a maximum of 5 queries, even for extensive cell lists. Broad, inclusive queries are preferable in such cases.
+
+Instructions:
+- Analyze the prompt and `List of Target Cells` thoroughly.
+- Devise queries, specific or generalized, based on the cell(s) data requirements.
+- Submit your queries as a Python-interpretable list.
+
+Remember, your role is crucial for accruing accurate, relevant data efficiently. Strategize wisely, ensuring each query is purposeful and potent.""" 
+
 
     def _get_user_message_content(self, target,exhausted_queries):
+        print('GENERATE QUERIES FOR')
+        print(target)
+        print("EXHAUSTED QUERIES")
+        print(exhausted_queries)
         return f"""Context: 
 `Prompt`: '''{self.prompt}'''
 
@@ -105,17 +118,25 @@ Cell 4: Apple, Sugar Content g per 100g
 `Previous Attempts`: '''"origin of apples", "apple vitamin C content", "apples dietary fiber content", "how much sugar in an apple"'''"""
     },
     {
-'role': 'assistant',
-'content': """[
-"apple origin agricultural history",
-"vitamin C content in apples study",
-"apples dietary fiber scientific analysis",
-"sugar content in apples research"
+        'role': 'assistant',
+        'content': """[
+"comprehensive nutritional profile of apples",
+"scientific analysis of apple nutritional values",
+"apple nutritional facts from official databases",
+"research papers on apple nutrition"
 ]"""
     },
+    {
+        'role': 'user',
+        'content': """Great work! These queries are broad enough to potentially provide information for all the target cells simultaneously, which is more efficient than addressing each cell individually. Remember, the goal is to fill in all target cells with as few queries as possible, so always think about how you can maximize the potential of each query."""
+    },
+    {
+        'role': 'assistant',
+        'content': """Understood, the focus is on crafting efficient, broad queries that can yield comprehensive information capable of filling multiple target cells at once. This approach maximizes the utility of each query and improves overall efficiency."""
+    },
 
-
-   {
+    # Example 2
+    {
         'role': 'user',
         'content': """`Prompt`: '''I need specifics on the Tesla Model 3's performance and specifications. Details such as the origin country, battery life, acceleration, maximum speed, and price are crucial. Only use recent, official, or well-regarded automotive sources for the most accurate information.'''
 `List of Target Cells`: 
@@ -130,13 +151,21 @@ Cell 5: Tesla Model 3, Price
     },
     {
         'role': 'assistant',
-'content': """[
-"Tesla Model 3 official manufacturer specifications",
-"Tesla Model 3 battery performance analysis 2023",
-"official Tesla Model 3 0 to 60 acceleration time",
-"verified top speed of Tesla Model 3",
-"Tesla Model 3 official pricing 2023"
+        'content': """[
+"Tesla Model 3 complete specifications and performance review",
+"Tesla Model 3 official specs from manufacturer",
+"comprehensive review and analysis of Tesla Model 3 features",
+"latest reports on Tesla Model 3 performance metrics",
+"Tesla Model 3 pricing and performance comparison"
 ]"""
+    },
+    {
+        'role': 'user',
+        'content': """These queries are well-crafted and likely to return comprehensive resources on the Tesla Model 3's specifications. You've effectively used broad terms that encourage the return of sources with multiple pieces of information relevant to the different target cells. This strategy is excellent for efficiency and accuracy."""
+    },
+    {
+        'role': 'assistant',
+        'content': """Acknowledged, I will continue to formulate queries that are likely to yield comprehensive and multifaceted information, fulfilling multiple target cells at once and ensuring efficiency in the search process."""
     },
 
     # Example 3
@@ -152,12 +181,71 @@ Cell 1: Tokyo, Average Annual Temperature
     },
     {
         'role': 'assistant',
-        'content': """["Tokyo historical annual temperature data",
-"meteorological report average temperature Tokyo",
-"Tokyo climate scientific study",
-"official weather statistics Tokyo yearly average temperature"]"""
+        'content': """[
+"Tokyo decade-long average annual temperature official report",
+"scientific studies on Tokyo's historical climate patterns",
+"meteorological data on Tokyo's yearly temperatures",
+"climate change impact on temperatures in Tokyo over the past decade"
+]"""
+    },
+    {
+        'role': 'user',
+        'content': """These queries are well-framed, aiming directly at the required information with a high probability of retrieving data from credible and official sources. When the target is very specific, as in this single-cell case, it's vital to craft queries that are equally precise to ensure the accuracy and relevance of the information obtained."""
+    },
+    {
+        'role': 'assistant',
+        'content': """Understood, precision is key in situations with highly specific targets. Crafting queries that align closely with the required information ensures that the results are both relevant and accurate, drawing from credible sources."""
+    },
+
+    # Counter-Example
+    {
+        'role': 'user',
+        'content': """`Prompt`: '''Compile a comprehensive comparison of major US airlines' reimbursement policies for flight delays and cancellations. Focus on standard practices and legal obligations.'''
+`List of Target Cells`: 
+'''
+Cell 1: Delta Airlines, Reimbursement Criteria
+Cell 2: American Airlines, Reimbursement Criteria
+Cell 3: Southwest Airlines, Reimbursement Criteria
+Cell 4: United Airlines, Reimbursement Criteria
+Cell 5: JetBlue Airways, Reimbursement Criteria
+'''
+`Previous Attempts`: '''"Delta Airlines delay policy", "American Airlines delay compensation", "Southwest Airlines flight cancellation rights", "United Airlines passenger reimbursement", "JetBlue delay compensation procedures"'''"""
+    },
+    {
+        'role': 'assistant',
+        'content': """[
+"Delta Airlines passenger delay compensation policy",
+"American Airlines reimbursement criteria for travel disruptions",
+"Southwest Airlines policy for delayed flights compensation",
+"United Airlines passenger rights for flight cancellations",
+"JetBlue Airways compensation procedures in event of delays"
+]"""
+    },
+    {
+        'role': 'user',
+        'content': """While these queries are detailed, they're not the most efficient approach given the task at hand. We're looking for comprehensive information across multiple airlines, not isolated data from individual airlines. A more effective strategy involves broader queries potentially encapsulating all target cells, making the search more efficient. Try to formulate queries that could return sources comparing or discussing reimbursement policies across these airlines. Remember, the goal is to fill in all target cells with as few queries as possible."""
+    },
+    {
+        'role': 'assistant',
+        'content': """[
+"comparison of US airlines' delay and cancellation reimbursement policies",
+"passenger rights for flight disruptions across major US airlines",
+"overview of compensation criteria for flight delays among top US airlines",
+"guide to seeking reimbursement for flight cancellations from US airlines",
+"how do Delta, American, Southwest, United, JetBlue handle flight delay compensations"
+]"""
+    },
+    {
+        'role': 'user',
+        'content': """Excellent adjustment! These queries are much more likely to lead us to comprehensive sources that cover all the airlines listed, rather than individual pages for each airline. This approach is not only more efficient but also aligns with our goal of generating overarching queries that can fill multiple target cells simultaneously."""
+    },
+    {
+        'role': 'assistant',
+        'content': """Acknowledged, the emphasis is on maximizing the efficiency of each query by seeking comprehensive sources capable of addressing multiple target cells. This approach not only saves time but also increases the likelihood of finding consistent, comparative information."""
     }
+
 ]
+
 
 
 # Usage example:

@@ -45,6 +45,7 @@ class SemanticsHandler:
                 try:
                     # Generate a response using GPT-3
                     response = completion(messages=[self._get_system_message(), self._get_user_message(cell_str)],max_token_count= 1000)  # Placeholder for actual GPT-3 completion
+
                    # print(cell)
                     #print(response)
                     response_embedding = embedding(response)  # Embed the GPT-3 response
@@ -98,7 +99,7 @@ class SemanticsHandler:
             similarities = [self.calculate_similarity(response_embedding, chunk_embedding) for chunk_embedding in chunk_embeddings]
             filtered_similarities = [
                 {"content": chunk_data[i][0], "URL": chunk_data[i][1]} 
-                for i, similarity in enumerate(similarities) if similarity > 0.84
+                for i, similarity in enumerate(similarities) #if similarity > 0.84
             ]
 
             # Sorting by similarity (if needed you can still sort by a score even though it's not in the final output)

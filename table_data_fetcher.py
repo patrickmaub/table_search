@@ -20,7 +20,7 @@ class TableDataFetcher:
         self.query_queue = SearchQueryQueue(self.cells, self.prompt)
         self.question_answerer = QuestionAnswerer(self.prompt)
         self.search_engine = SearchEngine()
-        self.semantics_handler = SemanticsHandler(max_chunks_per_cell=5)
+        self.semantics_handler = SemanticsHandler(max_chunks_per_cell=2)
 
     def debug_print(self, message):
         """Prints a debug message if debugging is enabled."""
@@ -52,12 +52,13 @@ class TableDataFetcher:
                     self.debug_print('Target cells were None, skipping.')
                     continue
 
-                num_cells_with_response = sum(
-                    1 for cell in target_cells if self.cells[cell]['Response'] not in (None, 'null'))
 
-                total_cells = len(target_cells)
 
-                if not query or num_cells_with_response == total_cells:
+                empty_target_cells = [cell for cell in target_cells if self.cells[cell]['Response'] is None]
+
+                target_cells = empty_target_cells
+
+                if not query or not target_cells:
                     continue
                # print('Retrieving results')
                 unprocessed_results = []
@@ -78,13 +79,6 @@ class TableDataFetcher:
                             if str(self_cell) == cell:
                                 matching_cell[self_cell] = self.cells[self_cell]
                                 break
-
-                        
-
-                        
-
-                        #make matching cell from a str in a tuple
-
 
                         if matching_cell:
 

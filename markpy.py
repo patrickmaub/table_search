@@ -24,7 +24,8 @@ def format_as_markdown_table(data):
                     new_line += " N/A |"
                     continue
                 # Remove newlines and limit the response length
-                response = ' '.join(data[key]['Response'].split())
+                resp = str(data[key]['Response'])
+                response = ' '.join (resp.split())
                 #response = textwrap.shorten(response, width=100, placeholder="...")
                 new_line += f" {response} |"
             else:
